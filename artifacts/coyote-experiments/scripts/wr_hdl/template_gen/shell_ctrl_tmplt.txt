@@ -1,0 +1,577 @@
+/**
+  * Copyright (c) 2021, Systems Group, ETH Zurich
+  * All rights reserved.
+  *
+  * Redistribution and use in source and binary forms, with or without modification,
+  * are permitted provided that the following conditions are met:
+  *
+  * 1. Redistributions of source code must retain the above copyright notice,
+  * this list of conditions and the following disclaimer.
+  * 2. Redistributions in binary form must reproduce the above copyright notice,
+  * this list of conditions and the following disclaimer in the documentation
+  * and/or other materials provided with the distribution.
+  * 3. Neither the name of the copyright holder nor the names of its contributors
+  * may be used to endorse or promote products derived from this software
+  * without specific prior written permission.
+  *
+  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+  * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+  * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+  * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+  * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+  * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+  */
+
+`timescale 1ns / 1ps
+
+import lynxTypes::*;
+
+`define BD_CTRL
+
+module shell_split_ctrl (
+    AXI4.s          s_axi_main,
+
+    AXI4L.m        m_axi_cnfg,
+    AXI4L.m        m_axi_ctrl [N_REGIONS],
+{% if cnfg.en_avx %}
+    AXI4.m         m_axim_ctrl [N_REGIONS],
+{% endif %}
+
+    input  logic        aclk,
+    input  logic        aresetn
+);
+
+`ifdef BD_CTRL
+
+design_ctrl inst_design_ctrl (
+    .axi_ctrl_main_araddr(s_axi_main.araddr),
+    .axi_ctrl_main_arburst(s_axi_main.arburst),
+    .axi_ctrl_main_arcache(s_axi_main.arcache),
+    .axi_ctrl_main_arid(s_axi_main.arid),
+    .axi_ctrl_main_arlen(s_axi_main.arlen),
+    .axi_ctrl_main_arlock(s_axi_main.arlock),
+    .axi_ctrl_main_arprot(s_axi_main.arprot),
+    .axi_ctrl_main_arqos(s_axi_main.arqos),
+    .axi_ctrl_main_arregion(s_axi_main.arregion),
+    .axi_ctrl_main_arsize(s_axi_main.arsize),
+    .axi_ctrl_main_arready(s_axi_main.arready),
+    .axi_ctrl_main_arvalid(s_axi_main.arvalid),
+    .axi_ctrl_main_awaddr(s_axi_main.awaddr),
+    .axi_ctrl_main_awburst(s_axi_main.awburst),
+    .axi_ctrl_main_awcache(s_axi_main.awcache),
+    .axi_ctrl_main_awid(s_axi_main.awid),
+    .axi_ctrl_main_awlen(s_axi_main.awlen),
+    .axi_ctrl_main_awlock(s_axi_main.awlock),
+    .axi_ctrl_main_awprot(s_axi_main.awprot),
+    .axi_ctrl_main_awqos(s_axi_main.awqos),
+    .axi_ctrl_main_awregion(s_axi_main.awregion),
+    .axi_ctrl_main_awsize(s_axi_main.awsize),
+    .axi_ctrl_main_awready(s_axi_main.awready),
+    .axi_ctrl_main_awvalid(s_axi_main.awvalid),
+    .axi_ctrl_main_bid(s_axi_main.bid),
+    .axi_ctrl_main_bready(s_axi_main.bready),
+    .axi_ctrl_main_bresp(s_axi_main.bresp),
+    .axi_ctrl_main_bvalid(s_axi_main.bvalid),
+    .axi_ctrl_main_rdata(s_axi_main.rdata),
+    .axi_ctrl_main_rid(s_axi_main.rid),
+    .axi_ctrl_main_rlast(s_axi_main.rlast),
+    .axi_ctrl_main_rready(s_axi_main.rready),
+    .axi_ctrl_main_rresp(s_axi_main.rresp),
+    .axi_ctrl_main_rvalid(s_axi_main.rvalid),
+    .axi_ctrl_main_wdata(s_axi_main.wdata),
+    .axi_ctrl_main_wlast(s_axi_main.wlast),
+    .axi_ctrl_main_wready(s_axi_main.wready),
+    .axi_ctrl_main_wstrb(s_axi_main.wstrb),
+    .axi_ctrl_main_wvalid(s_axi_main.wvalid),
+    
+    .axi_cnfg_araddr(m_axi_cnfg.araddr),
+    .axi_cnfg_arprot(m_axi_cnfg.arprot),
+    .axi_cnfg_arready(m_axi_cnfg.arready),
+    .axi_cnfg_arvalid(m_axi_cnfg.arvalid),
+    .axi_cnfg_awaddr(m_axi_cnfg.awaddr),
+    .axi_cnfg_awprot(m_axi_cnfg.awprot),
+    .axi_cnfg_awready(m_axi_cnfg.awready),
+    .axi_cnfg_awvalid(m_axi_cnfg.awvalid),
+    .axi_cnfg_bready(m_axi_cnfg.bready),
+    .axi_cnfg_bresp(m_axi_cnfg.bresp),
+    .axi_cnfg_bvalid(m_axi_cnfg.bvalid),
+    .axi_cnfg_rdata(m_axi_cnfg.rdata),
+    .axi_cnfg_rready(m_axi_cnfg.rready),
+    .axi_cnfg_rresp(m_axi_cnfg.rresp),
+    .axi_cnfg_rvalid(m_axi_cnfg.rvalid),
+    .axi_cnfg_wdata(m_axi_cnfg.wdata),
+    .axi_cnfg_wready(m_axi_cnfg.wready),
+    .axi_cnfg_wstrb(m_axi_cnfg.wstrb),
+    .axi_cnfg_wvalid(m_axi_cnfg.wvalid),
+{% for i in range(0, cnfg.n_reg) %}
+    .axi_ctrl_{{ i }}_araddr(m_axi_ctrl[{{ i }}].araddr),
+    .axi_ctrl_{{ i }}_arprot(m_axi_ctrl[{{ i }}].arprot),
+    .axi_ctrl_{{ i }}_arready(m_axi_ctrl[{{ i }}].arready),
+    .axi_ctrl_{{ i }}_arvalid(m_axi_ctrl[{{ i }}].arvalid),
+    .axi_ctrl_{{ i }}_awaddr(m_axi_ctrl[{{ i }}].awaddr),
+    .axi_ctrl_{{ i }}_awprot(m_axi_ctrl[{{ i }}].awprot),
+    .axi_ctrl_{{ i }}_awready(m_axi_ctrl[{{ i }}].awready),
+    .axi_ctrl_{{ i }}_awvalid(m_axi_ctrl[{{ i }}].awvalid),
+    .axi_ctrl_{{ i }}_bready(m_axi_ctrl[{{ i }}].bready),
+    .axi_ctrl_{{ i }}_bresp(m_axi_ctrl[{{ i }}].bresp),
+    .axi_ctrl_{{ i }}_bvalid(m_axi_ctrl[{{ i }}].bvalid),
+    .axi_ctrl_{{ i }}_rdata(m_axi_ctrl[{{ i }}].rdata),
+    .axi_ctrl_{{ i }}_rready(m_axi_ctrl[{{ i }}].rready),
+    .axi_ctrl_{{ i }}_rresp(m_axi_ctrl[{{ i }}].rresp),
+    .axi_ctrl_{{ i }}_rvalid(m_axi_ctrl[{{ i }}].rvalid),
+    .axi_ctrl_{{ i }}_wdata(m_axi_ctrl[{{ i }}].wdata),
+    .axi_ctrl_{{ i }}_wready(m_axi_ctrl[{{ i }}].wready),
+    .axi_ctrl_{{ i }}_wstrb(m_axi_ctrl[{{ i }}].wstrb),
+    .axi_ctrl_{{ i }}_wvalid(m_axi_ctrl[{{ i }}].wvalid),
+{% endfor %}
+{% if cnfg.en_avx %}
+    {% for i in range(0, cnfg.n_reg) %}
+    .axim_ctrl_{{ i }}_araddr(m_axim_ctrl[{{ i }}].araddr),
+    .axim_ctrl_{{ i }}_arburst(m_axim_ctrl[{{ i }}].arburst),
+    .axim_ctrl_{{ i }}_arcache(m_axim_ctrl[{{ i }}].arcache),
+    .axim_ctrl_{{ i }}_arlen(m_axim_ctrl[{{ i }}].arlen),
+    .axim_ctrl_{{ i }}_arlock(m_axim_ctrl[{{ i }}].arlock),
+    .axim_ctrl_{{ i }}_arprot(m_axim_ctrl[{{ i }}].arprot),
+    .axim_ctrl_{{ i }}_arqos(m_axim_ctrl[{{ i }}].arqos),
+    .axim_ctrl_{{ i }}_arready(m_axim_ctrl[{{ i }}].arready),
+    .axim_ctrl_{{ i }}_arregion(m_axim_ctrl[{{ i }}].arregion),
+    .axim_ctrl_{{ i }}_arsize(m_axim_ctrl[{{ i }}].arsize),
+    .axim_ctrl_{{ i }}_arvalid(m_axim_ctrl[{{ i }}].arvalid),
+    .axim_ctrl_{{ i }}_awaddr(m_axim_ctrl[{{ i }}].awaddr),
+    .axim_ctrl_{{ i }}_awburst(m_axim_ctrl[{{ i }}].awburst),
+    .axim_ctrl_{{ i }}_awcache(m_axim_ctrl[{{ i }}].awcache),
+    .axim_ctrl_{{ i }}_awlen(m_axim_ctrl[{{ i }}].awlen),
+    .axim_ctrl_{{ i }}_awlock(m_axim_ctrl[{{ i }}].awlock),
+    .axim_ctrl_{{ i }}_awprot(m_axim_ctrl[{{ i }}].awprot),
+    .axim_ctrl_{{ i }}_awqos(m_axim_ctrl[{{ i }}].awqos),
+    .axim_ctrl_{{ i }}_awready(m_axim_ctrl[{{ i }}].awready),
+    .axim_ctrl_{{ i }}_awregion(m_axim_ctrl[{{ i }}].awregion),
+    .axim_ctrl_{{ i }}_awsize(m_axim_ctrl[{{ i }}].awsize),
+    .axim_ctrl_{{ i }}_awvalid(m_axim_ctrl[{{ i }}].awvalid),
+    .axim_ctrl_{{ i }}_bready(m_axim_ctrl[{{ i }}].bready),
+    .axim_ctrl_{{ i }}_bresp(m_axim_ctrl[{{ i }}].bresp),
+    .axim_ctrl_{{ i }}_bvalid(m_axim_ctrl[{{ i }}].bvalid),
+    .axim_ctrl_{{ i }}_rdata(m_axim_ctrl[{{ i }}].rdata),
+    .axim_ctrl_{{ i }}_rlast(m_axim_ctrl[{{ i }}].rlast),
+    .axim_ctrl_{{ i }}_rready(m_axim_ctrl[{{ i }}].rready),
+    .axim_ctrl_{{ i }}_rresp(m_axim_ctrl[{{ i }}].rresp),
+    .axim_ctrl_{{ i }}_rvalid(m_axim_ctrl[{{ i }}].rvalid),
+    .axim_ctrl_{{ i }}_wdata(m_axim_ctrl[{{ i }}].wdata),
+    .axim_ctrl_{{ i }}_wlast(m_axim_ctrl[{{ i }}].wlast),
+    .axim_ctrl_{{ i }}_wready(m_axim_ctrl[{{ i }}].wready),
+    .axim_ctrl_{{ i }}_wstrb(m_axim_ctrl[{{ i }}].wstrb),
+    .axim_ctrl_{{ i }}_wvalid(m_axim_ctrl[{{ i }}].wvalid),
+    {% endfor %}
+{% endif %}
+    .aclk(aclk),
+    .aresetn(aresetn)
+);
+
+`else
+
+//  
+// Sink path
+//
+
+AXI4 axi_sink_s0 ();
+AXI4 axi_sink_xbar ();
+
+axi_reg_shell_sink (.aclk(aclk), .aresetn(aresetn), .s_axi(s_axi_main), .m_axi(axi_sink_s0));
+axi_data_fifo_shell_sink (.aclk(aclk), .aresetn(aresetn), .s_axi(axi_sink_s0), .m_axi(axi_sink_xbar));
+
+//
+// Xbar
+//
+
+// Sink
+logic [AXI_ID_BITS-1:0] axi_xbar_sink_awid;
+logic [AXI_ADDR_BITS-1:0] axi_xbar_sink_awaddr;
+logic [7:0] axi_xbar_sink_awlen;
+logic [2:0] axi_xbar_sink_awsize;
+logic [1:0] axi_xbar_sink_awburst;
+logic [0:0] axi_xbar_sink_awlock;
+logic [3:0] axi_xbar_sink_awcache;
+logic [2:0] axi_xbar_sink_awprot;
+logic [3:0] axi_xbar_sink_awqos;
+logic [3:0] axi_xbar_sink_awregion;
+logic axi_xbar_sink_awvalid;
+logic axi_xbar_sink_awready;
+logic [AXI_ID_BITS-1:0] axi_xbar_sink_arid;
+logic [AXI_ADDR_BITS-1:0] axi_xbar_sink_araddr;
+logic [7:0] axi_xbar_sink_arlen;
+logic [2:0] axi_xbar_sink_arsize;
+logic [1:0] axi_xbar_sink_arburst;
+logic [0:0] axi_xbar_sink_arlock;
+logic [3:0] axi_xbar_sink_arcache;
+logic [2:0] axi_xbar_sink_arprot;
+logic [3:0] axi_xbar_sink_arqos;
+logic [3:0] axi_xbar_sink_arregion;
+logic axi_xbar_sink_arvalid;
+logic axi_xbar_sink_arready;
+logic [AXI_DATA_BITS-1:0] axi_xbar_sink_wdata;
+logic [AXI_DATA_BITS/8-1:0] axi_xbar_sink_wstrb;
+logic axi_xbar_sink_wlast;
+logic axi_xbar_sink_wvalid;
+logic axi_xbar_sink_wready;
+logic [AXI_ID_BITS-1:0] axi_xbar_sink_bid;
+logic [1:0] axi_xbar_sink_bresp;
+logic axi_xbar_sink_bvalid;
+logic axi_xbar_sink_bready;
+logic [AXI_ID_BITS-1:0] axi_xbar_sink_rid;
+logic [AXI_DATA_BITS-1:0] axi_xbar_sink_rdata;
+logic [1:0] axi_xbar_sink_rresp;
+logic axi_xbar_sink_rlast;
+logic axi_xbar_sink_rvalid;
+logic axi_xbar_sink_rready;
+
+assign axi_xbar_sink_araddr 	= axi_sink_xbar.araddr;	
+assign axi_xbar_sink_arburst 	= axi_sink_xbar.arburst;
+assign axi_xbar_sink_arcache	= axi_sink_xbar.arcache;
+assign axi_xbar_sink_arid		= axi_sink_xbar.arid;	
+assign axi_xbar_sink_arlen		= axi_sink_xbar.arlen;	
+assign axi_xbar_sink_arlock		= axi_sink_xbar.arlock;	
+assign axi_xbar_sink_arprot		= axi_sink_xbar.arprot;	
+assign axi_xbar_sink_arqos		= axi_sink_xbar.arqos;	
+assign axi_xbar_sink_arregion	= axi_sink_xbar.arregion;
+assign axi_xbar_sink_arsize		= axi_sink_xbar.arsize;	
+assign axi_xbar_sink_arvalid 	= axi_sink_xbar.arvalid;
+assign axi_xbar_sink_awaddr 	= axi_sink_xbar.awaddr;	
+assign axi_xbar_sink_awburst 	= axi_sink_xbar.awburst;
+assign axi_xbar_sink_awcache	= axi_sink_xbar.awcache;
+assign axi_xbar_sink_awid		= axi_sink_xbar.awid;	
+assign axi_xbar_sink_awlen		= axi_sink_xbar.awlen;	
+assign axi_xbar_sink_awlock		= axi_sink_xbar.awlock;	
+assign axi_xbar_sink_awprot		= axi_sink_xbar.awprot;	
+assign axi_xbar_sink_awqos		= axi_sink_xbar.awqos;	
+assign axi_xbar_sink_awregion	= axi_sink_xbar.awregion;
+assign axi_xbar_sink_awsize		= axi_sink_xbar.awsize;	
+assign axi_xbar_sink_awvalid 	= axi_sink_xbar.awvalid;
+assign axi_xbar_sink_rready		= axi_sink_xbar.rready;	
+assign axi_xbar_sink_wdata		= axi_sink_xbar.wdata;	
+assign axi_xbar_sink_wlast		= axi_sink_xbar.wlast;	
+assign axi_xbar_sink_wstrb		= axi_sink_xbar.wstrb;	
+assign axi_xbar_sink_wvalid		= axi_sink_xbar.wvalid;	
+assign axi_xbar_sink_bready		= axi_sink_xbar.bready;	
+
+assign axi_sink_xbar.arready	= axi_xbar_sink_arready;
+assign axi_sink_xbar.awready	= axi_xbar_sink_awready;
+assign axi_sink_xbar.rdata		= axi_xbar_sink_rdata;	
+assign axi_sink_xbar.rid 		= axi_xbar_sink_rid;	
+assign axi_sink_xbar.rlast 		= axi_xbar_sink_rlast;	
+assign axi_sink_xbar.rresp		= axi_xbar_sink_rresp;	
+assign axi_sink_xbar.rvalid 	= axi_xbar_sink_rvalid;
+assign axi_sink_xbar.wready		= axi_xbar_sink_wready;	
+assign axi_sink_xbar.bid		= axi_xbar_sink_bid;	
+assign axi_sink_xbar.bresp		= axi_xbar_sink_bresp;	
+assign axi_sink_xbar.bvalid		= axi_xbar_sink_bvalid;	
+
+// Src
+{% if cnfg.en_avx %}
+AXI4 axi_src_xbar [2*N_REGIONS+1] ();
+
+logic [(2*N_REGIONS+1)*AXI_ID_BITS-1:0] axi_xbar_src_awid;
+logic [(2*N_REGIONS+1)*AXI_ADDR_BITS-1:0] axi_xbar_src_awaddr;
+logic [(2*N_REGIONS+1)*8-1:0] axi_xbar_src_awlen;
+logic [(2*N_REGIONS+1)*3-1:0] axi_xbar_src_awsize;
+logic [(2*N_REGIONS+1)*2-1:0] axi_xbar_src_awburst;
+logic [(2*N_REGIONS+1)*1-1:0] axi_xbar_src_awlock;
+logic [(2*N_REGIONS+1)*4-1:0] axi_xbar_src_awcache;
+logic [(2*N_REGIONS+1)*3-1:0] axi_xbar_src_awprot;
+logic [(2*N_REGIONS+1)*4-1:0] axi_xbar_src_awqos;
+logic [(2*N_REGIONS+1)*4-1:0] axi_xbar_src_awregion;
+logic [(2*N_REGIONS+1)*1-1:0] axi_xbar_src_awvalid;
+logic [(2*N_REGIONS+1)*1-1:0] axi_xbar_src_awready;
+logic [(2*N_REGIONS+1)*AXI_ID_BITS-1:0] axi_xbar_src_arid;
+logic [(2*N_REGIONS+1)*AXI_ADDR_BITS-1:0] axi_xbar_src_araddr;
+logic [(2*N_REGIONS+1)*8-1:0] axi_xbar_src_arlen;
+logic [(2*N_REGIONS+1)*3-1:0] axi_xbar_src_arsize;
+logic [(2*N_REGIONS+1)*2-1:0] axi_xbar_src_arburst;
+logic [(2*N_REGIONS+1)*1-1:0] axi_xbar_src_arlock;
+logic [(2*N_REGIONS+1)*4-1:0] axi_xbar_src_arcache;
+logic [(2*N_REGIONS+1)*3-1:0] axi_xbar_src_arprot;
+logic [(2*N_REGIONS+1)*4-1:0] axi_xbar_src_arqos;
+logic [(2*N_REGIONS+1)*4-1:0] axi_xbar_src_arregion;
+logic [(2*N_REGIONS+1)*1-1:0] axi_xbar_src_arvalid;
+logic [(2*N_REGIONS+1)*1-1:0] axi_xbar_src_arready;
+logic [(2*N_REGIONS+1)*AXI_DATA_BITS-1:0] axi_xbar_src_wdata;
+logic [(2*N_REGIONS+1)*AXI_DATA_BITS/8-1:0] axi_xbar_src_wstrb;
+logic [(2*N_REGIONS+1)*1-1:0] axi_xbar_src_wlast;
+logic [(2*N_REGIONS+1)*1-1:0] axi_xbar_src_wvalid;
+logic [(2*N_REGIONS+1)*1-1:0] axi_xbar_src_wready;
+logic [(2*N_REGIONS+1)*AXI_ID_BITS-1:0] axi_xbar_src_bid;
+logic [(2*N_REGIONS+1)*2-1:0] axi_xbar_src_bresp;
+logic [(2*N_REGIONS+1)*1-1:0] axi_xbar_src_bvalid;
+logic [(2*N_REGIONS+1)*1-1:0] axi_xbar_src_bready;
+logic [(2*N_REGIONS+1)*AXI_ID_BITS-1:0] axi_xbar_src_rid;
+logic [(2*N_REGIONS+1)*AXI_DATA_BITS-1:0] axi_xbar_src_rdata;
+logic [(2*N_REGIONS+1)*2-1:0] axi_xbar_src_rresp;
+logic [(2*N_REGIONS+1)*1-1:0] axi_xbar_src_rlast;
+logic [(2*N_REGIONS+1)*1-1:0] axi_xbar_src_rvalid;
+logic [(2*N_REGIONS+1)*1-1:0] axi_xbar_src_rready;
+
+for(genvar i = 0; i < 2*N_REGIONS+1; i++) begin
+    assign axi_src_xbar[i].araddr 	    = axi_xbar_src_araddr[i*AXI_ADDR_BITS+:AXI_ADDR_BITS];
+    assign axi_src_xbar[i].arburst 	    = axi_xbar_src_arburst[i*2+:2];
+    assign axi_src_xbar[i].arcache	    = axi_xbar_src_arcache[i*4+:4];
+    assign axi_src_xbar[i].arid		    = axi_xbar_src_arid[i*AXI_ID_BITS+:AXI_ID_BITS];
+    assign axi_src_xbar[i].arlen		= axi_xbar_src_arlen[i*8+:8];
+    assign axi_src_xbar[i].arlock		= axi_xbar_src_arlock[i*1+:1];
+    assign axi_src_xbar[i].arprot		= axi_xbar_src_arprot[i*3+:3];
+    assign axi_src_xbar[i].arqos		= axi_xbar_src_arqos[i*4+:4];
+    assign axi_src_xbar[i].arregion	    = axi_xbar_src_arregion[i*4+:4];
+    assign axi_src_xbar[i].arsize		= axi_xbar_src_arsize[i*3+:3];
+    assign axi_src_xbar[i].arvalid 	    = axi_xbar_src_arvalid[i*1+:1];
+    assign axi_src_xbar[i].awaddr 	    = axi_xbar_src_awaddr[i*AXI_ADDR_BITS+:AXI_ADDR_BITS];
+    assign axi_src_xbar[i].awburst 	    = axi_xbar_src_awburst[i*2+:2];
+    assign axi_src_xbar[i].awcache	    = axi_xbar_src_awcache[i*4+:4];
+    assign axi_src_xbar[i].awid		    = axi_xbar_src_awid[i*AXI_ID_BITS+:AXI_ID_BITS];
+    assign axi_src_xbar[i].awlen		= axi_xbar_src_awlen[i*8+:8];
+    assign axi_src_xbar[i].awlock		= axi_xbar_src_awlock[i*1+:1];
+    assign axi_src_xbar[i].awprot		= axi_xbar_src_awprot[i*3+:3];
+    assign axi_src_xbar[i].awqos		= axi_xbar_src_awqos[i*4+:4];
+    assign axi_src_xbar[i].awregion	    = axi_xbar_src_awregion[i*4+:4];
+    assign axi_src_xbar[i].awsize		= axi_xbar_src_awsize[i*3+:3];
+    assign axi_src_xbar[i].awvalid 	    = axi_xbar_src_awvalid[i*1+:1];
+    assign axi_src_xbar[i].rready		= axi_xbar_src_rready[i*1+:1];
+    assign axi_src_xbar[i].wdata		= axi_xbar_src_wdata[i*AXI_DATA_BITS+:AXI_DATA_BITS];
+    assign axi_src_xbar[i].wlast		= axi_xbar_src_wlast[i*1+:1];
+    assign axi_src_xbar[i].wstrb		= axi_xbar_src_wstrb[i*AXI_ADDR_BITS/8+:AXI_DATA_BITS/8];
+    assign axi_src_xbar[i].wvalid		= axi_xbar_src_wvalid[i*1+:1];
+    assign axi_src_xbar[i].bready		= axi_xbar_src_bready[i*1+:1];
+
+    assign axi_xbar_src_arready[i*1+:1]	                        = axi_src_xbar[i].arready;
+    assign axi_xbar_src_awready[i*1+:1]	                        = axi_src_xbar[i].awready;
+    assign axi_xbar_src_rdata[i*AXI_DATA_BITS+:AXI_DATA_BITS]   = axi_src_xbar[i].rdata;	
+    assign axi_xbar_src_rid[i*AXI_ID_BITS+:AXI_ID_BITS] = axi_src_xbar[i].rid;	
+    assign axi_xbar_src_rlast[i*1+:1] 		                    = axi_src_xbar[i].rlast;	
+    assign axi_xbar_src_rresp[i*2+:2]		                    = axi_src_xbar[i].rresp;	
+    assign axi_xbar_src_rvalid[i*1+:1] 	                        = axi_src_xbar[i].rvalid;
+    assign axi_xbar_src_wready[i*1+:1]		                    = axi_src_xbar[i].wready;	
+    assign axi_xbar_src_bid[i*AXI_ID_BITS+:AXI_ID_BITS] = axi_src_xbar[i].bid;	
+    assign axi_xbar_src_bresp[i*2+:2]		                    = axi_src_xbar[i].bresp;	
+    assign axi_xbar_src_bvalid[i*1+:1]		                    = axi_src_xbar[i].bvalid;	
+end
+{% else %}
+AXI4 axi_src_xbar [N_REGIONS+1] ();
+
+logic [(N_REGIONS+1)*AXI_ID_BITS-1:0] axi_xbar_src_awid;
+logic [(N_REGIONS+1)*AXI_ADDR_BITS-1:0] axi_xbar_src_awaddr;
+logic [(N_REGIONS+1)*8-1:0] axi_xbar_src_awlen;
+logic [(N_REGIONS+1)*3-1:0] axi_xbar_src_awsize;
+logic [(N_REGIONS+1)*2-1:0] axi_xbar_src_awburst;
+logic [(N_REGIONS+1)*1-1:0] axi_xbar_src_awlock;
+logic [(N_REGIONS+1)*4-1:0] axi_xbar_src_awcache;
+logic [(N_REGIONS+1)*3-1:0] axi_xbar_src_awprot;
+logic [(N_REGIONS+1)*4-1:0] axi_xbar_src_awqos;
+logic [(N_REGIONS+1)*1-1:0] axi_xbar_src_awvalid;
+logic [(N_REGIONS+1)*1-1:0] axi_xbar_src_awready;
+logic [(N_REGIONS+1)*AXI_ID_BITS-1:0] axi_xbar_src_arid;
+logic [(N_REGIONS+1)*AXI_ADDR_BITS-1:0] axi_xbar_src_araddr;
+logic [(N_REGIONS+1)*8-1:0] axi_xbar_src_arlen;
+logic [(N_REGIONS+1)*3-1:0] axi_xbar_src_arsize;
+logic [(N_REGIONS+1)*2-1:0] axi_xbar_src_arburst;
+logic [(N_REGIONS+1)*1-1:0] axi_xbar_src_arlock;
+logic [(N_REGIONS+1)*4-1:0] axi_xbar_src_arcache;
+logic [(N_REGIONS+1)*3-1:0] axi_xbar_src_arprot;
+logic [(N_REGIONS+1)*4-1:0] axi_xbar_src_arqos;
+logic [(N_REGIONS+1)*1-1:0] axi_xbar_src_arvalid;
+logic [(N_REGIONS+1)*1-1:0] axi_xbar_src_arready;
+logic [(N_REGIONS+1)*AXI_DATA_BITS-1:0] axi_xbar_src_wdata;
+logic [(N_REGIONS+1)*AXI_DATA_BITS/8-1:0] axi_xbar_src_wstrb;
+logic [(N_REGIONS+1)*1-1:0] axi_xbar_src_wlast;
+logic [(N_REGIONS+1)*1-1:0] axi_xbar_src_wvalid;
+logic [(N_REGIONS+1)*1-1:0] axi_xbar_src_wready;
+logic [(N_REGIONS+1)*AXI_ID_BITS-1:0] axi_xbar_src_bid;
+logic [(N_REGIONS+1)*2-1:0] axi_xbar_src_bresp;
+logic [(N_REGIONS+1)*1-1:0] axi_xbar_src_bvalid;
+logic [(N_REGIONS+1)*1-1:0] axi_xbar_src_bready;
+logic [(N_REGIONS+1)*AXI_ID_BITS-1:0] axi_xbar_src_rid;
+logic [(N_REGIONS+1)*AXI_DATA_BITS-1:0] axi_xbar_src_rdata;
+logic [(N_REGIONS+1)*2-1:0] axi_xbar_src_rresp;
+logic [(N_REGIONS+1)*1-1:0] axi_xbar_src_rlast;
+logic [(N_REGIONS+1)*1-1:0] axi_xbar_src_rvalid;
+logic [(N_REGIONS+1)*1-1:0] axi_xbar_src_rready;
+
+for(genvar i = 0; i < N_REGIONS+1; i++) begin
+    assign axi_src_xbar[i].araddr 	    = axi_xbar_src_araddr[i*AXI_ADDR_BITS+:AXI_ADDR_BITS];
+    assign axi_src_xbar[i].arburst 	    = axi_xbar_src_arburst[i*2+:2];
+    assign axi_src_xbar[i].arcache	    = axi_xbar_src_arcache[i*4+:4];
+    assign axi_src_xbar[i].arid		    = axi_xbar_src_arid[i*AXI_ID_BITS+:AXI_ID_BITS];
+    assign axi_src_xbar[i].arlen		= axi_xbar_src_arlen[i*8+:8];
+    assign axi_src_xbar[i].arlock		= axi_xbar_src_arlock[i*1+:1];
+    assign axi_src_xbar[i].arprot		= axi_xbar_src_arprot[i*3+:3];
+    assign axi_src_xbar[i].arqos		= axi_xbar_src_arqos[i*4+:4];
+    assign axi_src_xbar[i].arregion	    = axi_xbar_src_arregion[i*4+:4];
+    assign axi_src_xbar[i].arsize		= axi_xbar_src_arsize[i*3+:3];
+    assign axi_src_xbar[i].arvalid 	    = axi_xbar_src_arvalid[i*1+:1];
+    assign axi_src_xbar[i].awaddr 	    = axi_xbar_src_awaddr[i*AXI_ADDR_BITS+:AXI_ADDR_BITS];
+    assign axi_src_xbar[i].awburst 	    = axi_xbar_src_awburst[i*2+:2];
+    assign axi_src_xbar[i].awcache	    = axi_xbar_src_awcache[i*4+:4];
+    assign axi_src_xbar[i].awid		    = axi_xbar_src_awid[i*AXI_ID_BITS+:AXI_ID_BITS];
+    assign axi_src_xbar[i].awlen		= axi_xbar_src_awlen[i*8+:8];
+    assign axi_src_xbar[i].awlock		= axi_xbar_src_awlock[i*1+:1];
+    assign axi_src_xbar[i].awprot		= axi_xbar_src_awprot[i*3+:3];
+    assign axi_src_xbar[i].awqos		= axi_xbar_src_awqos[i*4+:4];
+    assign axi_src_xbar[i].awregion	    = axi_xbar_src_awregion[i*4+:4];
+    assign axi_src_xbar[i].awsize		= axi_xbar_src_awsize[i*3+:3];
+    assign axi_src_xbar[i].awvalid 	    = axi_xbar_src_awvalid[i*1+:1];
+    assign axi_src_xbar[i].rready		= axi_xbar_src_rready[i*1+:1];
+    assign axi_src_xbar[i].wdata		= axi_xbar_src_wdata[i*AXI_DATA_BITS+:AXI_DATA_BITS];
+    assign axi_src_xbar[i].wlast		= axi_xbar_src_wlast[i*1+:1];
+    assign axi_src_xbar[i].wstrb		= axi_xbar_src_wstrb[i*AXI_ADDR_BITS/8+:AXI_DATA_BITS/8];
+    assign axi_src_xbar[i].wvalid		= axi_xbar_src_wvalid[i*1+:1];
+    assign axi_src_xbar[i].bready		= axi_xbar_src_bready[i*1+:1];
+
+    assign axi_xbar_src_arready[i*1+:1]	                        = axi_src_xbar[i].arready;
+    assign axi_xbar_src_awready[i*1+:1]	                        = axi_src_xbar[i].awready;
+    assign axi_xbar_src_rdata[i*AXI_DATA_BITS+:AXI_DATA_BITS]   = axi_src_xbar[i].rdata;	
+    assign axi_xbar_src_rid[i*AXI_ID_BITS+:AXI_ID_BITS] = axi_src_xbar[i].rid;	
+    assign axi_xbar_src_rlast[i*1+:1] 		                    = axi_src_xbar[i].rlast;	
+    assign axi_xbar_src_rresp[i*2+:2]		                    = axi_src_xbar[i].rresp;	
+    assign axi_xbar_src_rvalid[i*1+:1] 	                        = axi_src_xbar[i].rvalid;
+    assign axi_xbar_src_wready[i*1+:1]		                    = axi_src_xbar[i].wready;	
+    assign axi_xbar_src_bid[i*AXI_ID_BITS+:AXI_ID_BITS] = axi_src_xbar[i].bid;	
+    assign axi_xbar_src_bresp[i*2+:2]		                    = axi_src_xbar[i].bresp;	
+    assign axi_xbar_src_bvalid[i*1+:1]		                    = axi_src_xbar[i].bvalid;	
+end
+{% endif %}
+
+// XBAR
+shell_xbar inst_shell_xbar (
+    .s_axi_awid(axi_xbar_sink_awid),
+    .s_axi_awaddr(axi_xbar_sink_awaddr),
+    .s_axi_awlen(axi_xbar_sink_awlen),
+    .s_axi_awsize(axi_xbar_sink_awsize),
+    .s_axi_awburst(axi_xbar_sink_awburst),
+    .s_axi_awlock(axi_xbar_sink_awlock),
+    .s_axi_awcache(axi_xbar_sink_awcache),
+    .s_axi_awprot(axi_xbar_sink_awprot),
+    .s_axi_awqos(axi_xbar_sink_awqos),
+    .s_axi_awvalid(axi_xbar_sink_awvalid),
+    .s_axi_awready(axi_xbar_sink_awready),
+    .s_axi_wdata(axi_xbar_sink_wdata),
+    .s_axi_wstrb(axi_xbar_sink_wstrb),
+    .s_axi_wlast(axi_xbar_sink_wlast),
+    .s_axi_wvalid(axi_xbar_sink_wvalid),
+    .s_axi_wready(axi_xbar_sink_wready),
+    .s_axi_bid(axi_xbar_sink_bid),
+    .s_axi_bresp(axi_xbar_sink_bresp),
+    .s_axi_bvalid(axi_xbar_sink_bvalid),
+    .s_axi_bready(axi_xbar_sink_bready),
+    .s_axi_arid(axi_xbar_sink_arid),
+    .s_axi_araddr(axi_xbar_sink_araddr),
+    .s_axi_arlen(axi_xbar_sink_arlen),
+    .s_axi_arsize(axi_xbar_sink_arsize),
+    .s_axi_arburst(axi_xbar_sink_arburst),
+    .s_axi_arlock(axi_xbar_sink_arlock),
+    .s_axi_arcache(axi_xbar_sink_arcache),
+    .s_axi_arprot(axi_xbar_sink_arprot),
+    .s_axi_arqos(axi_xbar_sink_arqos),
+    .s_axi_arvalid(axi_xbar_sink_arvalid),
+    .s_axi_arready(axi_xbar_sink_arready),
+    .s_axi_rid(axi_xbar_sink_rid),
+    .s_axi_rdata(axi_xbar_sink_rdata),
+    .s_axi_rresp(axi_xbar_sink_rresp),
+    .s_axi_rlast(axi_xbar_sink_rlast),
+    .s_axi_rvalid(axi_xbar_sink_rvalid),
+    .s_axi_rready(axi_xbar_sink_rready),
+
+    .m_axi_awid(axi_xbar_src_awid),
+    .m_axi_awaddr(axi_xbar_src_awaddr),
+    .m_axi_awlen(axi_xbar_src_awlen),
+    .m_axi_awsize(axi_xbar_src_awsize),
+    .m_axi_awburst(axi_xbar_src_awburst),
+    .m_axi_awlock(axi_xbar_src_awlock),
+    .m_axi_awcache(axi_xbar_src_awcache),
+    .m_axi_awprot(axi_xbar_src_awprot),
+    .m_axi_awqos(axi_xbar_src_awqos),
+    .m_axi_awvalid(axi_xbar_src_awvalid),
+    .m_axi_awready(axi_xbar_src_awready),
+    .m_axi_wdata(axi_xbar_src_wdata),
+    .m_axi_wstrb(axi_xbar_src_wstrb),
+    .m_axi_wlast(axi_xbar_src_wlast),
+    .m_axi_wvalid(axi_xbar_src_wvalid),
+    .m_axi_wready(axi_xbar_src_wready),
+    .m_axi_bid(axi_xbar_src_bid),
+    .m_axi_bresp(axi_xbar_src_bresp),
+    .m_axi_bvalid(axi_xbar_src_bvalid),
+    .m_axi_bready(axi_xbar_src_bready),
+    .m_axi_arid(axi_xbar_src_arid),
+    .m_axi_araddr(axi_xbar_src_araddr),
+    .m_axi_arlen(axi_xbar_src_arlen),
+    .m_axi_arsize(axi_xbar_src_arsize),
+    .m_axi_arburst(axi_xbar_src_arburst),
+    .m_axi_arlock(axi_xbar_src_arlock),
+    .m_axi_arcache(axi_xbar_src_arcache),
+    .m_axi_arprot(axi_xbar_src_arprot),
+    .m_axi_arqos(axi_xbar_src_arqos),
+    .m_axi_arvalid(axi_xbar_src_arvalid),
+    .m_axi_arready(axi_xbar_src_arready),
+    .m_axi_rid(axi_xbar_src_rid),
+    .m_axi_rdata(axi_xbar_src_rdata),
+    .m_axi_rresp(axi_xbar_src_rresp),
+    .m_axi_rlast(axi_xbar_src_rlast),
+    .m_axi_rvalid(axi_xbar_src_rvalid),
+    .m_axi_rready(axi_xbar_src_rready),
+
+    .aclk(aclk),
+    .aresetn(aresetn)
+);
+
+//
+// Source paths
+//
+
+AXI4 axi_cnfg_s0 ();
+AXI4 #(.AXI4_DATA_BITS(AXIL_DATA_BITS), .AXI4_ID_BITS(AXI_ID_BITS)) axi_cnfg_s1 ();
+AXI4 #(.AXI4_DATA_BITS(AXIL_DATA_BITS), .AXI4_ID_BITS(AXI_ID_BITS)) axi_cnfg_s2 ();
+AXI4L axi_cnfg_s3 ();
+
+// Cnfg
+axi_reg_shell_src_s0 (.aclk(aclk), .aresetn(aresetn), .s_axi(axi_src_xbar[0]), .m_axi(axi_cnfg_s0));
+axi_dwidth_shell_src_s1 (.aclk(aclk), .aresetn(aresetn), .s_axi(axi_cnfg_s0), .m_axi(axi_cnfg_s1));
+axi_reg_shell_src_s2 (.aclk(aclk), .aresetn(aresetn), .s_axi(axi_cnfg_s1), .m_axi(axi_cnfg_s2));
+axi_protocol_shell_src_s3 (.aclk(aclk), .aresetn(aresetn), .s_axi(axi_cnfg_s2), .m_axi(axi_cnfg_s3));
+axi_reg_shell_src_s4 (.aclk(aclk), .aresetn(aresetn), .s_axi(axi_cnfg_s3), .m_axi(m_axi_cnfg));
+
+// Ctrl
+AXI4 axi_ctrl_s0 [N_REGIONS] ();
+AXI4 #(.AXI4_DATA_BITS(AXIL_DATA_BITS), .AXI4_ID_BITS(AXI_ID_BITS)) axi_ctrl_s1 [N_REGIONS] ();
+AXI4 #(.AXI4_DATA_BITS(AXIL_DATA_BITS), .AXI4_ID_BITS(AXI_ID_BITS)) axi_ctrl_s2 [N_REGIONS] ();
+AXI4L axi_ctrl_s3 [N_REGIONS] ();
+
+// AVX ctrl
+{% if cnfg.en_avx %}
+AXI4 #(.AXI4_ID_BITS(AXI_ID_BITS)) axim_ctrl_s0 [N_REGIONS] ();
+AXI4 #(.AXI4_DATA_BITS(AVX_DATA_BITS), .AXI4_ID_BITS(AXI_ID_BITS)) axim_ctrl_s1 [N_REGIONS] ();
+
+    {% for i in range(0, cnfg.n_reg) %}
+axi_reg_shell_src_s0 (.aclk(aclk), .aresetn(aresetn), .s_axi(axi_src_xbar[{{ 2*i+1 }}]), .m_axi(axi_ctrl_s0[{{ i }}]));
+axi_dwidth_shell_src_s1 (.aclk(aclk), .aresetn(aresetn), .s_axi(axi_ctrl_s0[{{ i }}]), .m_axi(axi_ctrl_s1[{{ i }}]));
+axi_reg_shell_src_s2 (.aclk(aclk), .aresetn(aresetn), .s_axi(axi_ctrl_s1[{{ i }}]), .m_axi(axi_ctrl_s2[{{ i }}]));
+axi_protocol_shell_src_s3 (.aclk(aclk), .aresetn(aresetn), .s_axi(axi_ctrl_s2[{{ i }}]), .m_axi(axi_ctrl_s3[{{ i }}]));
+axi_reg_shell_src_s4 (.aclk(aclk), .aresetn(aresetn), .s_axi(axi_ctrl_s3[{{ i }}]), .m_axi(m_axi_ctrl[{{ i }}]));
+
+axim_reg_shell_src_s0 (.aclk(aclk), .aresetn(aresetn), .s_axi(axi_src_xbar[{{ 2*i+2 }}]), .m_axi(axim_ctrl_s0[{{ i }}]));
+axim_dwidth_shell_src_s1 (.aclk(aclk), .aresetn(aresetn), .s_axi(axim_ctrl_s0[{{ i }}]), .m_axi(axim_ctrl_s1[{{ i }}]));
+axim_reg_shell_src_s2 (.aclk(aclk), .aresetn(aresetn), .s_axi(axim_ctrl_s1[{{ i }}]), .m_axi(m_axim_ctrl[{{ i }}]));
+
+    {% endfor %}
+{% else %}
+
+    {% for i in range(0, cnfg.n_reg) %}
+axi_reg_shell_src_s0 (.aclk(aclk), .aresetn(aresetn), .s_axi(axi_src_xbar[{{ i+1 }}]), .m_axi(axi_ctrl_s0[{{ i }}]));
+axi_dwidth_shell_src_s1 (.aclk(aclk), .aresetn(aresetn), .s_axi(axi_ctrl_s0[{{ i }}]), .m_axi(axi_ctrl_s1[{{ i }}]));
+axi_reg_shell_src_s2 (.aclk(aclk), .aresetn(aresetn), .s_axi(axi_ctrl_s1[{{ i }}]), .m_axi(axi_ctrl_s2[{{ i }}]));
+axi_protocol_shell_src_s3 (.aclk(aclk), .aresetn(aresetn), .s_axi(axi_ctrl_s2[{{ i }}]), .m_axi(axi_ctrl_s3[{{ i }}]));
+axi_reg_shell_src_s4 (.aclk(aclk), .aresetn(aresetn), .s_axi(axi_ctrl_s3[{{ i }}]), .m_axi(m_axi_ctrl[{{ i }}]));
+    {% endfor %}
+
+{% endif %}
+
+`endif
+
+endmodule
