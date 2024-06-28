@@ -1,4 +1,4 @@
-# AMD-OHC-2024: DPI for RDMA on FPGAs at linerate
+# RoCE Balboa - Payload-based Intrusion Detection for RDMA-traffic with ML-models
 Our contribution to the AMD Open Hardware Contest: A ML-based Deep Packet Inspection for RDMA-networking on FPGAs
 
 ## General description of the project 
@@ -11,6 +11,9 @@ The main contributions of this project include the selection of adequate Machine
 <picture>
     <img src="img/Architecture_Diagram.jpg" width = 600>
 </picture>
+
+Thus, our main contribution is the integration of a Ml-based DPI for the detection of potentially malicious executables in packet payloads at line rate in network traffic. The relevant added files to the existing design can be found at `/artifacts/coyote-experiments/hw/hdl/network/rdma` and include `intrusion_detection_decider.sv`, `common/payload_extractor.sv` and all the `myproject_*.sv`-files. Adaptations were necessary to `roce_stack.sv` as well as for the HLS-implementation of the RDMA-packet processing pipeline in `/artifacts/coyote-experiments/hw/services/network/hls/rocev2`. 
+As required for this competition, we paid great attention to the "openness" and re-usability of our design: Since our hardware-stack communicates via the standardized AXI4-Stream-interface at 512 Bit width and looks at raw payloads to generally detect x86-executables, it can easily be adopted to any kind of FPGA-based networking stack for Deep Packet Inspection as well as in other security-related domains of data-stream computing. 
 
 ## Hardware Prerequisites 
 Since this project is built around a networking service, at least two connected servers are required for the replication of our experiments. Switched networks are acceptable and have been extensively tested. The targeted FPGA-platform is a `Alveo U55C`-accelerator card, connected via PCIe to the server. For our experiments about the cross-compatibility of our design in heterogeneous networking setups a dedicated ASIC-based NIC is required - our provided programs and scripts target a `Mellanox Connect-X5` card. 

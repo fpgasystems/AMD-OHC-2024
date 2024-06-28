@@ -207,7 +207,7 @@ intrusion_detection_decider inst_intrusion_detection_decider (
 );
 
 // Create an ILA for observing the ML-decider 
-ila_ml inst_ila_ml (
+/* ila_ml inst_ila_ml (
     .clk(nclk), 
     .probe0(s_axis_rx.tvalid),          // 1
     .probe1(s_axis_rx.tlast),           // 1
@@ -230,7 +230,7 @@ ila_ml inst_ila_ml (
     .probe18(roce_to_icrc.tlast),       // 1
     .probe19(roce_to_icrc.tkeep),       // 64
     .probe20(roce_to_icrc.tdata)        // 512
-);
+); */ 
 
 
 // ChipScope around the ICRC 
