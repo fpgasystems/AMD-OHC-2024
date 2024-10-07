@@ -101,8 +101,7 @@ int main(int argc, char *argv[])
 	bool thr_test = 0;
 	bool write_op = 1;
 	// uint32_t own_server_no = 10;
-	uint32t ip_addr = 0; 
-
+	uint32_t ip_addr = 184371810;
 	uint32_t mult_factor = 1; 
 	if(write_op) {
 		mult_factor = 2; 

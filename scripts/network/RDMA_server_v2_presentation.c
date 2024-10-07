@@ -101,7 +101,7 @@ int main(int argc, char *argv[])
 	bool thr_test = 0;
 	bool write_op = 1;
 	// uint32_t own_server_no = 7;
-	uint32_t ip_addr = 0;  
+	uint32_t ip_addr = 184371810;  
 
 	uint32_t mult_factor = 1; 
 	if(write_op) {
@@ -366,7 +366,7 @@ int main(int argc, char *argv[])
 	local_ibvQ->psn = remote_ibvQ->psn; 
 	local_ibvQ->size = n_pages*hugePageSize;
 	// local_ibvQ->ip_addr = 184371778 + (own_server_no-1)*4;
-	local_ibvQ->size = ip_addr; 
+	local_ibvQ->ip_addr = ip_addr; 
 	// local_ibvQ->ip_addr = 184371810;
 	// local_ibvQ->ip_addr = 184371814;
 	// local_ibvQ->ip_addr = 184371814; 
