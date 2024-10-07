@@ -110,7 +110,7 @@ As described before, the software on both servers needs to be build from `perf_r
     ~~~
 * On the other machine, run then the command: 
     ~~~
-    $ ./main -b 1 -n 64 -x 65536 -r 0 -l 1 -w 1 -t <Mellanox-IP-address>
+    $ ./main -b 1 -n 64 -x 65536 -r 100 -l 100 -w 1 -t <Mellanox-IP-address>
     ~~~
   The target-address specified as argument `-t` is used for the RDMA-QP-exchange via TCP, which is not part of the selected build-configuration of Coyote. Thus, the argument cannot be the FPGA-assigned IP-address, but either the direct IP-address of the other server or the network-address of a commodity NIC connected to that target-server. In general, such an address can be found via `ifconfig`. If the experiments are conducted on the ETH HACC, the Mellanox-cards can be used for meta-setup. The required addresses for these are given in the table above. 
 This experiment will conduct batched throughput- and ping-pong-style latency-tests, 100 repetitions each per message size from 64 Bytes up to 64 Kilobytes. The results should be printed per message size. 
@@ -128,7 +128,7 @@ The resulting executable now has to be called first on the Mellanox-server. The 
 ~~~
 $ ./main -b 1 -n 64 -x 64 -r 0 -l 1 -w 1 -t <Mellanox-IP-address>
 ~~~ 
-If the Mellanox-side runs `RDMA_server_v2.c`, the FPGA-side should now show a print-out of the received and acceptable payload - a warm greeting to the OHC-audience. On the other hand, if the Mellanox-side runs `RDMA_server_v2_presentation.c`, the payload will trigger DPI and therefore be blocked and not received on the FPGA-side. As a consequence, no printout will be generated. 
+If the Mellanox-side runs `RDMA_server_v2.c`, the FPGA-side should now show a print-out of the received and acceptable payload - a warm greeting to the audience. On the other hand, if the Mellanox-side runs `RDMA_server_v2_presentation.c`, the payload will trigger DPI and therefore be blocked and not received on the FPGA-side. As a consequence, no printout will be generated. 
 
 # SW / ML-artifacts: How to evaluate the model-performance 
 Finally, as part of the project, scripts for training and evaluating the models are included. We trained models using QKeras, a Python library built on top of Keras and TensorFlow for training quantized neural networks, which are particularly suitable for the FPGA architecture. To train the model, a dataset is required. As described in Section III-B of the project report, the models were trained on a wide range of file types. As these files stem from different, publicly available datasets, each of which has its own applicable T&Cs, but also takes up significant storage space, we couldn't include the data used for training in the submission. Instead, those wishing to train models should follow the steps described in Section III-B of the report to obtain the various files used for training the models. Once the data is prepared, the first step is to create a Python virtual environment. To train the model, it's necessary to have TensorFlow, QKeras and NumPy installed; however, since we use hls4ml to convert the model to an FPGA IP, it is sufficient to only install hls4ml, as it has the former libraries as dependencies. To do so, the following commands are required:
